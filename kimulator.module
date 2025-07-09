@@ -18,7 +18,6 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
 	if(!$prompt)
                 $prompt = 'Wie funktioniert eine KI?';
         if (!empty($prompt) && $_GET['gp']) {
-            //$api_key = "sk-proj-NXJXw73uY1Ii_i9xbvYs7tdNvB25ukyzitLLGVrt9c2oBsFilm_uy1CukrCJStpAyIaoJaaAqiT3BlbkFJq4nfOAy0lJ6suX9fW5BzCjdBn_tPpwGCh5o7rFF7AvxaK3lZ8puaEhHO6LVdoZopaQO-AHRv";
             $endpoint = "https://api.openai.com/v1/chat/completions";
             $response = getAPIResponse($prompt, $endpoint, $api_key);
             //echo "<h2>KI:</h2>";

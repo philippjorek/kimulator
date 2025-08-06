@@ -1,8 +1,0 @@
-kimulator.start:
-  path: '/kimulator/main' 
-  defaults:
-    _title: 'Welcome to KI generated Content Engine'
-    _controller: '\Drupal\kimulator\Plugin\main::build'
-  requirements:
-#    _permission: 'access content'
-    _user_is_logged_in: 'TRUE'  

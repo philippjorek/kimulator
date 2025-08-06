@@ -1,0 +1,4 @@
+name: kimulator
+type: module
+description: 'ki api'
+core_version_requirement: ^11

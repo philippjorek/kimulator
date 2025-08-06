@@ -1,0 +1,135 @@
+<?php
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Site\Settings;
+
+//Create Drupal Node:
+use Drupal\node\Entity\Node;
+use Drupal\file\Entity\File;
+use Drupal\Core\Language\Language;
+
+
+
+function kimulator_help($route_name, RouteMatchInterface $route_match) {
+  //switch ($route_name) {
+    //case 'help.page.kimolator':
+      //$output = "KI shows custom content";
+
+	$api_key = Settings::get('set_apikey_openai', NULL);
+        $prompt = $_GET['gp'];
+        //$prompt='konzept fuer ki in drupal';
+	if(!$prompt)
+                $prompt = 'Wie funktioniert eine KI?';
+        if (!empty($prompt) && $_GET['gp']) {
+            $endpoint = "https://api.openai.com/v1/chat/completions";
+            $response = getAPIResponse($prompt, $endpoint, $api_key);
+            //echo "<h2>KI:</h2>";
+                //$response = str_replace(' - ',  '<br /><br />- ', $response);
+                //$response = str_replace('** *', '**<br /><br />*', $response);
+                //$response = str_replace('* **', '*<br /><br />**', $response);
+                 $response = str_replace(' **', '**<br /><br />', $response);
+                $response = str_replace('###', '###<br /><br />', $response);
+
+
+
+
+            $output.= $response;
+        } else {
+            $output.= 'Bitte geben Sie einen Prompt mit der Variablen GP ein.';
+        }
+
+
+
+
+
+
+    return $output;
+  //}
+  return NULL;
+}
+
+
+
+    function getAPIResponse($prompt, $endpoint, $api_key) {
+        // Initialisiere die cURL-Sitzung
+        $ch = curl_init($endpoint);
+
+        // Setze cURL-Optionen
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "Authorization: Bearer $api_key",
+            "Content-Type: application/json"
+        ));
+
+        // Nutzlast für den Chat-Eingang unter Verwendung der Nachrichtenstruktur
+        $data = array(
+            'model' => 'gpt-4o-mini',
+            'messages' => array(
+                array('role' => 'system', 'content' => 'Sie sind ein hilfreicher A.'),
+                array('role' => 'user', 'content' => $prompt)
+            )
+        );
+        $data_string = json_encode($data);
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+
+        // Führe die cURL-Sitzung aus
+        $response = curl_exec($ch);
+
+        // Überprüfe auf cURL-Fehler
+        if(curl_errno($ch)){
+            echo 'Curl-Fehler: ' . curl_error($ch);
+            exit;
+        }
+
+        // Dekodiere die Antwort
+        $response_data = json_decode($response, true);
+
+        // Überprüfe, ob der Schlüssel 'choices' in der Antwort vorhanden ist und ob der Nachrichteninhalt vorhanden ist
+        if (!isset($response_data['choices']) || !isset($response_data['choices'][0]['message']['content'])) {
+            echo "Fehler: Unerwartete API-Antwort.<br>";
+            echo "Vollständige Antwort:<br>";
+            print_r($response_data);
+            exit;
+        }
+
+        // Hole die Antwort aus der API-Antwort
+        $answer = $response_data['choices'][0]['message']['content'];
+
+        // Schließe die cURL-Sitzung
+        curl_close($ch);
+
+
+	//Create Drupal Node
+	  $node = Node::create([
+   	 'type' => 'article', // Replace with your content type ID
+    	'title' => $prompt,
+    	'uid' => 1, // Replace with the user ID
+    	'langcode' => Language::LANGCODE_NOT_SPECIFIED, // Or the appropriate language code
+   	 'status' => 0, // Published
+   	 'promote' => 0, // Promoted to front page
+ 	 ]);
+
+	$node->set('body', $answer);
+	$node->save();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        return $answer;
+    }

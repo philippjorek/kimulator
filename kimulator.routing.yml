@@ -9,11 +9,11 @@ kimulator.start:
     _user_is_logged_in: 'TRUE'  
 
 kimulator.formki1:
-  path: '/kimulator/form'
+  path: '/kimulator/formki'
   defaults:
-    _title: 'KI generated Content Engine'
-#    _controller: '\Drupal\kimulator\Plugin\kiform'
-#   _controller: '\Drupal\kimulator\Plugin\kiform::build'
+      _title: 'KI form test'
+      _form: '\Drupal\kimulator\Plugin\kiform' 
+  #{  _controller: '\Drupal\kimulator\Plugin\kiform::build' }
   requirements:
 #    _permission: 'access content'
     _user_is_logged_in: 'TRUE'

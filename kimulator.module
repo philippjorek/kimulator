@@ -4,25 +4,29 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Site\Settings;
 
+use Drupal\media\Entity\Media;
+use \Drupal\node\Entity\Node;
+
 //Create Drupal Node:
-use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
 use Drupal\Core\Language\Language;
-
-
 
 function kimulator_help($route_name, RouteMatchInterface $route_match) {
   //switch ($route_name) {
     //case 'help.page.kimolator':
       //$output = "KI shows custom content";
 
+
+
+
+
 	$api_key = Settings::get('set_apikey_openai', NULL);
-        $prompt = $_GET['gp'];
-        //$prompt='konzept fuer ki in drupal';
-	if(!$prompt)
-                $prompt = 'Wie funktioniert eine KI?';
-        if (!empty($prompt) && $_GET['gp']) {
-            $endpoint = "https://api.openai.com/v1/chat/completions";
+        $prompt = $_POST['gp'];
+        //$prompt='comic foto portrait von klimawissenschaftler';
+	//if(!$prompt)
+         //       $prompt = 'Wie funktioniert eine KI?';
+        if (!empty($prompt) && $_POST['gp']) {
+            $endpoint = "https://api.openai.com/v1/chat/completions"; 
+            //$endpoint = "https://api.openai.com/v1/images"; 
             $response = getAPIResponse($prompt, $endpoint, $api_key);
             //echo "<h2>KI:</h2>";
                 //$response = str_replace(' - ',  '<br /><br />- ', $response);
@@ -36,17 +40,27 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
 
             $output.= $response;
         } else {
-            $output.= 'Bitte geben Sie einen Prompt mit der Variablen GP ein.';
+            $output.= '';
         }
 
 
 
+    /* speichere image 
+    // $data='https://.de/sites/default/files/i/logo2.jpg';
+    if (file_put_contents('public://ai.jpg', $output) === FALSE) {
+        $output='fehler';
+    }
+    else 
+        $output='OK';
 
+   
+     */
 
 
     return $output;
-  //}
+  //}   
   return NULL;
+  
 }
 
 
@@ -64,13 +78,24 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
         ));
 
         // Nutzlast für den Chat-Eingang unter Verwendung der Nachrichtenstruktur
+        // gpt-4o-mini
+        // billig: gpt-4.1-nano
         $data = array(
-            'model' => 'gpt-4o-mini',
+            'model' => 'gpt-4.1-mini',            
             'messages' => array(
                 array('role' => 'system', 'content' => 'Sie sind ein hilfreicher A.'),
                 array('role' => 'user', 'content' => $prompt)
             )
+            /*
+            'input' => 'porttraitfoto von klimaforscher, comic art',
+            'tools' => array(
+                array('type' => 'image_generation')
+            )
+            */
         );
+
+
+
         $data_string = json_encode($data);
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
@@ -101,35 +126,6 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
         // Schließe die cURL-Sitzung
         curl_close($ch);
 
-
-	//Create Drupal Node
-	  $node = Node::create([
-   	 'type' => 'article', // Replace with your content type ID
-    	'title' => $prompt,
-    	'uid' => 1, // Replace with the user ID
-    	'langcode' => Language::LANGCODE_NOT_SPECIFIED, // Or the appropriate language code
-   	 'status' => 0, // Published
-   	 'promote' => 0, // Promoted to front page
- 	 ]);
-
-	$node->set('body', $answer);
-	$node->save();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return $answer;
-    }
+    } 
+   

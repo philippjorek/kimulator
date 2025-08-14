@@ -1,71 +1,21 @@
 <?php
 
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Site\Settings;
 
-use Drupal\media\Entity\Media;
-use \Drupal\node\Entity\Node;
+    use Drupal\Core\Routing\RouteMatchInterface;
 
-//Create Drupal Node:
-use Drupal\Core\Language\Language;
 
-function kimulator_help($route_name, RouteMatchInterface $route_match) {
-  //switch ($route_name) {
-    //case 'help.page.kimolator':
-      //$output = "KI shows custom content";
+    function kimulator_help($route_name, RouteMatchInterface $route_match) {
+        if($route_name == 'help.page.kimulator')
+        return '<p>' . t('Ki Help Page KImulator.') . '</p>';  
+    } 
 
 
 
 
 
-	$api_key = Settings::get('set_apikey_openai', NULL);
-        $prompt = $_POST['gp'];
-        //$prompt='comic foto portrait von klimawissenschaftler';
-	//if(!$prompt)
-         //       $prompt = 'Wie funktioniert eine KI?';
-        if (!empty($prompt) && $_POST['gp']) {
-            $endpoint = "https://api.openai.com/v1/chat/completions"; 
-            //$endpoint = "https://api.openai.com/v1/images"; 
-            $response = getAPIResponse($prompt, $endpoint, $api_key);
-            //echo "<h2>KI:</h2>";
-                //$response = str_replace(' - ',  '<br /><br />- ', $response);
-                //$response = str_replace('** *', '**<br /><br />*', $response);
-                //$response = str_replace('* **', '*<br /><br />**', $response);
-                 $response = str_replace(' **', '**<br /><br />', $response);
-                $response = str_replace('###', '###<br /><br />', $response);
 
+    function getAPIResponse($prompt, $endpoint, $api_key, $option, $option_aimodel) {
 
-
-
-            $output.= $response;
-        } else {
-            $output.= '';
-        }
-
-
-
-    /* speichere image 
-    // $data='https://.de/sites/default/files/i/logo2.jpg';
-    if (file_put_contents('public://ai.jpg', $output) === FALSE) {
-        $output='fehler';
-    }
-    else 
-        $output='OK';
-
-   
-     */
-
-
-    return $output;
-  //}   
-  return NULL;
-  
-}
-
-
-
-    function getAPIResponse($prompt, $endpoint, $api_key) {
         // Initialisiere die cURL-Sitzung
         $ch = curl_init($endpoint);
 
@@ -79,9 +29,9 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
 
         // Nutzlast für den Chat-Eingang unter Verwendung der Nachrichtenstruktur
         // gpt-4o-mini
-        // billig: gpt-4.1-nano
+        // billig: gpt-4.1-nano 
         $data = array(
-            'model' => 'gpt-4.1-mini',            
+            'model' => $option_aimodel,            
             'messages' => array(
                 array('role' => 'system', 'content' => 'Sie sind ein hilfreicher A.'),
                 array('role' => 'user', 'content' => $prompt)
@@ -93,7 +43,6 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
             )
             */
         );
-
 
 
         $data_string = json_encode($data);
@@ -123,9 +72,15 @@ function kimulator_help($route_name, RouteMatchInterface $route_match) {
         // Hole die Antwort aus der API-Antwort
         $answer = $response_data['choices'][0]['message']['content'];
 
-        // Schließe die cURL-Sitzung
+        // Close cURL-Sitzung
         curl_close($ch);
+       
+        return $answer; 
+    }
 
-        return $answer;
-    } 
+
+
+
+    
+
    

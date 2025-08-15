@@ -108,8 +108,8 @@ class kiform extends Formbase  {
 				if (!empty($prompt) && $_POST['gp']) {
 					$endpoint = "https://api.openai.com/v1/chat/completions"; 
 					//$endpoint = "https://api.openai.com/v1/images"; 
-		//			$response = getAPIResponse($prompt, $endpoint, $api_key, $option_aiapiurl, $option_aimodel);
-          $response = 'gebe text zurueck';
+					$response = getAPIResponse($prompt, $endpoint, $api_key, $option_aiapiurl, $option_aimodel);
+        //  $response = 'gebe text zurueck';
 					//echo "<h2>KI:</h2>";
 						//$response = str_replace(' - ',  '<br /><br />- ', $response);
 						//$response = str_replace('** *', '**<br /><br />*', $response);
